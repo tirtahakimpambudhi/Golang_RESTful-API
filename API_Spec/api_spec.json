@@ -1,0 +1,486 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "RESTful-API Books",
+      "version": "1.0.0",
+      "contact": {
+        "name": "Tirta Hakim Pambudhi",
+        "email": "tirta.hakim45@smk.belajar.id",
+        "url": "https://github.com/tirtahakimpambudhi"
+      }
+    },
+    "servers": [
+      {
+        "description": "Servers Books RESTful-API",
+        "url": "http://{environment}/api",
+        "variables": {
+          "environment": {
+            "enum": ["localhost:8080", "example_domain.com"]
+          }
+        }
+      }
+    ],
+    "tags": [
+      {
+        "name": "Books",
+        "description": "Books Path & Method API related requests"
+      }
+    ],
+    "paths": {
+      "/books": {
+        "get": {
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "page",
+              "required": true,
+              "description": "Page to RESTful-API Books",
+              "in": "query",
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "summary": "Get All Books from the RESTful-API Books",
+          "tags": ["Books"],
+          "responses": {
+            "200": {
+              "description": "Response Success Get All Books",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_standar"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Response Failed due to Bad Request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "summary": "Create New Many Books to Database from RESTful-API Books",
+          "tags": ["Books"],
+          "requestBody": {
+            "required": true,
+            "description": "Request Body Books RESTful-API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/result_object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "tags": ["Books"],
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "ISBN",
+              "required": true,
+              "description": "ISBN to RESTful-API Books",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              },
+              "example": "?ISBN='XXX'&&ISBN='XXX'"
+            }
+          ],
+          "summary": "Delete Many Books From RESTful-API",
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "404": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/book": {
+        "post": {
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "summary": "Create New Books to Database from RESTful-API Books",
+          "tags": ["Books"],
+          "requestBody": {
+            "required": true,
+            "description": "Request Body Books RESTful-API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/result_object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/book/{bookISBN}": {
+        "get": {
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "bookISBN",
+              "schema": {
+                "type": "integer",
+                "required": true
+              },
+              "required": true,
+              "description": "parameters for find by ISBN books"
+            }
+          ],
+          "summary": "Get By ID Books Exist",
+          "tags": ["Books"],
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_standar"
+                  }
+                }
+              }
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "404": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "bookISBN",
+              "schema": {
+                "type": "integer",
+                "required": true
+              },
+              "required": true,
+              "description": "parameters for update books"
+            }
+          ],
+          "summary": "Update Books Exist",
+          "tags": ["Books"],
+          "requestBody": {
+            "required": true,
+            "description": "Request Body Books RESTful-API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/result_object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "400": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "404": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "security": [
+            {
+              "BooksAuth": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "bookISBN",
+              "schema": {
+                "type": "integer",
+                "required": true
+              },
+              "required": true,
+              "description": "parameters for delete books"
+            }
+          ],
+          "summary": "Delete Books Exist",
+          "tags": ["Books"],
+          "responses": {
+            "200": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            },
+            "404": {
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/response_errors"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "BooksAuth": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "X-API-Key",
+          "description": "Authentication RESTful-API Books"
+        }
+      },
+      "schemas": {
+        "result_object": {
+          "type": "object",
+          "properties": {
+            "isbn": {
+              "type": "integer",
+              "required": true
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 5,
+              "required": true
+            },
+            "author": {
+              "type": "string",
+              "maxLength": 100,
+              "minLength": 1,
+              "required": true
+            },
+            "publisher": {
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 5,
+              "required": true
+            },
+            "publication_years": {
+              "type": "string",
+              "maxLength": 5,
+              "minLength": 4,
+              "required": true
+            },
+            "status_borrow": {
+              "type": "boolean",
+              "default": false
+            },
+            "createdAt": {
+              "type": "string"
+            },
+            "updateAt": {
+              "type": "string"
+            }
+          }
+        },
+        "pagination": {
+          "type": "object",
+          "properties": {
+            "current_page": {
+              "type": "integer"
+            },
+            "total_page": {
+              "type": "integer"
+            }
+          }
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/result_object"
+          },
+          "minItems": 1
+        },
+        "response_object": {
+          "type": "object",
+          "properties": {
+            "books": {
+              "$ref": "#/components/schemas/results"
+            },
+            "pagination": {
+              "$ref": "#/components/schemas/pagination"
+            }
+          }
+        },
+        "responses_array": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/response_object"
+          },
+          "minItems": 0,
+          "maxLength": 1
+        },
+        "response_errors": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object"
+            }
+          }
+        },
+        "response_standar": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "object",
+              "$ref": "#/components/schemas/result_object"
+            }
+          }
+        },
+        "responses_standar": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "data": {
+              "type": "array",
+              "$ref": "#/components/schemas/responses_array"
+            }
+          }
+        }
+      }
+    }
+  }
+  
