@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"math"
+	"restful_api/config"
 	"restful_api/exception"
 	"restful_api/helper"
 	"restful_api/model/web"
 	"restful_api/repository"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type BooksServiceImpl struct {
@@ -19,25 +19,26 @@ type BooksServiceImpl struct {
 	Validate        *validator.Validate
 }
 
-var DataPerPage = 10
-
-func (service *BooksServiceImpl) FindAllBooks(ctx context.Context, page web.Pagination) []web.ResponseBooks {
+func (service *BooksServiceImpl) FindAllBooks(ctx context.Context, currentPage string) ([]web.ResponseBooks, int) {
 	tx, err := service.DB.Begin()
 	helper.PanicIFError(err)
 	defer helper.CommitOrRollback(tx)
+	if currentPage == "" || currentPage == "0" {
+		currentPage = "1"
+	}
+	currentPageParse := helper.ParamsParseInt(currentPage)
+	limit := config.DataPerPage
+	offset := (currentPageParse - 1) * limit
 
-	limit := DataPerPage
-	offset := (page.CurrentPage - 1) * limit
-
-	books := service.BooksRepository.FindAll(ctx, tx, limit, offset)
+	books, totalBooks := service.BooksRepository.FindAll(ctx, tx, limit, offset)
 
 	// Log: Received request to find all books
 	fmt.Println("Received request to find all books")
 
-	return helper.ToResponsesBooks(books)
+	return helper.ToResponsesBooks(books), totalBooks
 }
 
-func (service *BooksServiceImpl) Pagination(ctx context.Context, pageParams string) web.Pagination {
+func (service *BooksServiceImpl) Pagination(ctx context.Context, pageParams string, totalRecords int) web.Pagination {
 	tx, err := service.DB.Begin()
 	helper.PanicIFError(err)
 	defer helper.CommitOrRollback(tx)
@@ -46,9 +47,8 @@ func (service *BooksServiceImpl) Pagination(ctx context.Context, pageParams stri
 		pageParams = "1"
 	}
 
-	totalPage := math.Ceil(float64(service.BooksRepository.Count(ctx, tx)) / float64(DataPerPage)) 
+	totalPage := math.Ceil(float64(totalRecords) / float64(config.DataPerPage))
 	currentPage := helper.ParamsParseInt(pageParams)
-
 
 	// Log: Received request for pagination
 	fmt.Println("Received request for pagination")
@@ -134,7 +134,7 @@ func (service *BooksServiceImpl) DeleteBook(ctx context.Context, ISBN string) {
 	service.BooksRepository.Delete(ctx, tx, ISBN)
 }
 
-func (service *BooksServiceImpl) CreateBooks(ctx context.Context , requests []web.RequestBody) []web.ResponseBooks{
+func (service *BooksServiceImpl) CreateBooks(ctx context.Context, requests []web.RequestBody) []web.ResponseBooks {
 	for _, request := range requests {
 		validationError := service.Validate.Struct(request)
 		if validationError != nil {
@@ -147,11 +147,11 @@ func (service *BooksServiceImpl) CreateBooks(ctx context.Context , requests []we
 	helper.PanicIFError(err)
 	defer helper.CommitOrRollback(tx)
 
-		// Log: Received request to create a book
+	// Log: Received request to create a book
 	fmt.Println("Received request to create many books")
 
 	body := helper.ToDomainsBooks(requests)
-	err = service.BooksRepository.CreateMany(ctx,tx,body)
+	err = service.BooksRepository.CreateMany(ctx, tx, body)
 	if err != nil {
 		panic(exception.NewErrorDuplcated(err.Error()))
 	}
@@ -183,7 +183,6 @@ func (service *BooksServiceImpl) DeleteBooks(ctx context.Context, ISBNs []string
 
 	service.BooksRepository.DeleteMany(ctx, tx, ISBNs)
 }
-
 
 func NewBooksService(BooksRepo repository.BooksRepository, Database *sql.DB, Validation *validator.Validate) BooksService {
 	return &BooksServiceImpl{

@@ -14,7 +14,6 @@ type BooksControllerImpl struct {
 	BooksService service.BooksService
 }
 
-
 func (controller *BooksControllerImpl) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	var book web.RequestBody
 	helper.ReadFromRequestBody(r, &book)
@@ -55,8 +54,8 @@ func (controller *BooksControllerImpl) FindAll(w http.ResponseWriter, r *http.Re
 
 	log.Printf("Received request to find all books in controller with page: %v\n", page)
 
-	pagination := controller.BooksService.Pagination(r.Context(), page)
-	books := controller.BooksService.FindAllBooks(r.Context(), pagination)
+	books, totalBooks := controller.BooksService.FindAllBooks(r.Context(), page)
+	pagination := controller.BooksService.Pagination(r.Context(), page, totalBooks)
 	data := web.ResponseArray{
 		Books: books,
 		Page:  pagination,
@@ -125,7 +124,7 @@ func (controller *BooksControllerImpl) Deletes(w http.ResponseWriter, r *http.Re
 
 	log.Printf("Received request to delete a book with ISBNs (%v) in controller\n", helper.SliceToInterface(ISBNs)...)
 
-	controller.BooksService.DeleteBooks(r.Context(),ISBNs)
+	controller.BooksService.DeleteBooks(r.Context(), ISBNs)
 	response := web.ResponseStandar{
 		Code:    200,
 		Message: "Successfully deleted a books",
@@ -136,8 +135,7 @@ func (controller *BooksControllerImpl) Deletes(w http.ResponseWriter, r *http.Re
 	helper.WriteToResponseBody(w, response)
 }
 
-
-func NewBooksController( service service.BooksService)BooksController{
+func NewBooksController(service service.BooksService) BooksController {
 	return &BooksControllerImpl{
 		BooksService: service,
 	}

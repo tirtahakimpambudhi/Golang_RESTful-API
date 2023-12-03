@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -11,10 +12,10 @@ func InQueryPlaceholders(query string, length int) string {
 	for i := 0; i < length; i++ {
 		qword += "?,"
 	}
-	if strings.HasSuffix(qword,","){
+	if strings.HasSuffix(qword, ",") {
 		qword = qword[:len(qword)-1]
 	}
-	query = strings.Replace(query,"(?)",fmt.Sprintf("(%v)",qword),-1)
+	query = strings.Replace(query, "(?)", fmt.Sprintf("(%v)", qword), -1)
 	return query
 }
 
@@ -25,4 +26,11 @@ func SliceToInterface(slice []string) []interface{} {
 		result[i] = v
 	}
 	return result
+}
+
+func RemoveLimitOffset(query string) string {
+	re := regexp.MustCompile(`SELECT(.*)FROM(.*)LIMIT(.*)OFFSET(.*)`)
+	query = re.ReplaceAllString(query, "SELECT COUNT(*) FROM$2")
+
+	return query
 }

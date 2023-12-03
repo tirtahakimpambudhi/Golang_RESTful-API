@@ -5,17 +5,21 @@ import (
 	"os"
 	"path/filepath"
 	"restful_api/helper"
+	"strconv"
+
 	"github.com/joho/godotenv"
 )
 var workdir , _  = os.Getwd()
 // var BASEDIR = filepath.Join(workdir,"..")//jika untuk test
 var BASEDIR = filepath.Join(workdir) //jika main.go
-var DBHOST, DBPORT, DBUSER, DBPASS, DBNAME , TBNAME , DIALECT, CONNECT , HOST , PORT , ADDR string
+var DataPerPage int
+var DBHOST, DBPORT, DBUSER, DBPASS, DBNAME , TBNAME , DIALECT, CONNECT , HOST , PORT , ADDR  string
 
 func init() {
 	err := godotenv.Load(filepath.Join(BASEDIR,".env"))
 	helper.PanicIFError(err)
 
+	DataPerPage , _= strconv.Atoi(os.Getenv("dataperpage"))
 	DBHOST = os.Getenv("dbhost")
 	DBPORT = os.Getenv("dbport")
 	DBUSER = os.Getenv("dbuser")
