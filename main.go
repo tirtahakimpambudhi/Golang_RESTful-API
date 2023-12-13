@@ -2,21 +2,12 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"restful_api/config"
-	"restful_api/middleware"
-	"restful_api/routes"
+	"restful_api/injector"
 )
 
 func main() {
-	books := routes.BooksRoutes()
-	logging := middleware.Logging{
-		Handler: books,
-	}
-	server := http.Server{
-		Addr: config.ADDR,
-		Handler: &logging,
-	}
-	fmt.Printf("Running Server http://%v/api \n",config.ADDR)
-	server.ListenAndServe()
+	servers := injector.InitializeServers()
+	fmt.Printf("Running Server http://%v/api \n", config.ADDR)
+	servers.ListenAndServe()
 }
